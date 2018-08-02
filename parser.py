@@ -38,7 +38,7 @@ def escapeStringAndroid(string):
                                         ">": r"&gt;"
                                         }))
 
-def genAndroidXMLFiles(rows, fnamePrefix):
+def genLocFiles(rows, fnamePrefix):
 
 	hat = "<resources>\n\r"
 	footer = "</resources>"
@@ -47,19 +47,26 @@ def genAndroidXMLFiles(rows, fnamePrefix):
 
 	for lang in langs:
 
-		strings = ""
+		stringsAndroid = ""
+		stringsIos = ""
 
 		for row in rows[1:]:
 
 			key = row[0]
-			val = escapeStringAndroid(row[rows[0].index(lang)])
+			valAndroid = escapeStringAndroid(row[rows[0].index(lang)])
+			valIos = str(row[rows[0].index(lang)])
 
-			strings = strings + "".join(["\t<string name=\"", key, "\">", val, "</string>\n\r"])
+			stringsAndroid = stringsAndroid + "".join(["\t<string name=\"", key, "\">", valAndroid, "</string>\n\r"])
+			stringsIos = stringsIos + "".join(["\t\"", key, "\" = \"", valIos, "\";\n\r"])
 
 		androidDir = "android"
+		iosDir = "ios"
 
 		makeDir(androidDir)
-		fileFromStr(os.path.join(androidDir, "".join([fnamePrefix, "_", lang, ".xml"])), "".join([hat, strings, footer]))
+		fileFromStr(os.path.join(androidDir, "".join([fnamePrefix, "_", lang, ".xml"])), "".join([hat, stringsAndroid, footer]))
+
+		makeDir(iosDir)
+		fileFromStr(os.path.join(iosDir, "".join([fnamePrefix, "_", lang, ".strings"])), stringsIos)
 
 def genLocalizations():
 
@@ -84,7 +91,7 @@ def genLocalizations():
 
 		rows = columnsToRows(columns)
 
-		genAndroidXMLFiles(rows, sname)
+		genLocFiles(rows, sname)
 
 
 genLocalizations()
